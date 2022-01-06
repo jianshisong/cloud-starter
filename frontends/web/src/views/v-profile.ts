@@ -1,5 +1,5 @@
 import { BaseViewElement } from 'common/v-base.js';
-import { adoptStyleSheets, css, customElement, first, html, onEvent } from 'dom-native';
+import { adoptStyleSheets, css, customElement, first, html, on, onEvent } from 'dom-native';
 
 
 const _compCss = css`
@@ -23,7 +23,7 @@ const _compCss = css`
 		grid-template-rows: 3rem 1fr;
 		padding-bottom: 1rem;
 
-		transition: .5s all ease-in;
+		transition: .3s all ease-in;
 	}
 
 	.panel.show{
@@ -52,9 +52,9 @@ const _compCss = css`
 
 	.panel-content{
 		display: grid;
-    grid-auto-flow: row;
-    grid-auto-rows: min-content;
-    gap: 1rem;
+		grid-auto-flow: row;
+		grid-auto-rows: min-content;
+		gap: 1rem;
 		border-top: 1px solid #ccc;
 	}
 
@@ -101,10 +101,11 @@ export class ProfileView extends BaseViewElement {
 
 	@onEvent('pointerup', '.do-close')
 	doOk() {
-		first(this.shadowRoot, ".panel")?.classList.remove("show");
-		setTimeout(()=>{
+		const panel = first(this.shadowRoot, ".panel");
+		on(panel, 'transitionend', async (evt) => {
 			this.remove();
-		}, 1000);
+		});
+		first(this.shadowRoot, ".panel")?.classList.remove("show");
 	}
 
 	init() {
