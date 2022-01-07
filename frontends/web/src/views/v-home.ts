@@ -4,6 +4,7 @@ import { wksDco } from 'dcos';
 import { append, closest, customElement, elem, first, on, OnEvent, onEvent, onHub } from 'dom-native';
 import { Wks } from 'shared/entities.js';
 import { asNum } from 'utils-min';
+import { DgWksEdit } from './dg-wks-edit';
 
 @customElement('v-home')
 export class wksListView extends BaseViewElement {
@@ -31,6 +32,7 @@ export class wksListView extends BaseViewElement {
 
 			const [menu] = append(document.body, `
 			<c-menu id='wks-card-menu'>
+			<li class="do-edit">Edit</li>
 			<li class="do-delete">Delete</li>
 			</c-menu>`);
 
@@ -43,6 +45,15 @@ export class wksListView extends BaseViewElement {
 					throw new Error(`UI ERROR - cannot find data-type Case data-id on element ${cardEl}`);
 				}
 				await wksDco.remove(id);
+			})
+
+			on(menu, 'pointerup', '.do-edit', async (evt) => {
+				const id = cardEl!.getAttribute("data-id")!;
+				const dialogEl = append(document.body, elem('dg-wks-edit')) as DgWksEdit;
+				dialogEl.name = first(cardEl, "h2")?.innerText!;
+				on(dialogEl, 'WKS_EDIT', (evt) => {
+					wksDco.update(parseInt(id), evt.detail);
+				});
 			})
 		}
 	}
